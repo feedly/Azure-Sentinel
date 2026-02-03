@@ -90,16 +90,6 @@
                                 "name": "feedlyStreamIds",
                                 "required": true
                             }
-                        },
-                        {
-                            "type": "Textbox",
-                            "parameters": {
-                                "label": "Table Name",
-                                "placeholder": "feedly_indicators_CL",
-                                "type": "text",
-                                "name": "tableName",
-                                "defaultValue": "feedly_indicators_CL"
-                            }
                         }
                     ],
                     "title": "Connect to Feedly to start collecting IoCs in Microsoft Sentinel"
