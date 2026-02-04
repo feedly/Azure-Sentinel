@@ -32,14 +32,14 @@
   "variables": {
     "workspaceResourceId": "[resourceId('microsoft.OperationalInsights/Workspaces', parameters('workspace'))]",
     "_solutionName": "Feedly",
-    "_solutionVersion": "3.0.9",
+    "_solutionVersion": "3.0.11",
     "solutionId": "feedlyinc1693853810319.azure-sentinel-solution-feedly",
     "_solutionId": "[variables('solutionId')]",
-    "dataConnectorVersionConnectorDefinition": "3.0.9",
-    "dataConnectorVersionConnections": "3.0.9",
-    "_dataConnectorContentIdConnectorDefinition": "FeedlyConnectorTemplateConnectorDefinition",
+    "dataConnectorVersionConnectorDefinition": "3.0.11",
+    "dataConnectorVersionConnections": "3.0.11",
+    "_dataConnectorContentIdConnectorDefinition": "FeedlyConnectorTemplateConnectorDefinitionV2",
     "dataConnectorTemplateNameConnectorDefinition": "[concat(parameters('workspace'),'-dc-',uniquestring(variables('_dataConnectorContentIdConnectorDefinition')))]",
-    "_dataConnectorContentIdConnections": "FeedlyConnectorTemplateConnections",
+    "_dataConnectorContentIdConnections": "FeedlyConnectorTemplateConnectionsV2",
     "dataConnectorTemplateNameConnections": "[concat(parameters('workspace'),'-dc-',uniquestring(variables('_dataConnectorContentIdConnections')))]",
     "_solutioncontentProductId": "[concat(take(variables('_solutionId'),50),'-','sl','-', uniqueString(concat(variables('_solutionId'),'-','Solution','-',variables('_solutionId'),'-', variables('_solutionVersion'))))]"
   },
@@ -100,7 +100,7 @@
               "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/',variables('_dataConnectorContentIdConnectorDefinition'))]",
               "apiVersion": "2022-09-01-preview",
               "type": "Microsoft.OperationalInsights/workspaces/providers/dataConnectorDefinitions",
-              "location": "[parameters('workspace-location')]",
+              "location": "[resourceGroup().location]",
               "kind": "Customizable",
               "properties": {
                 "connectorUiConfig": {
@@ -253,10 +253,10 @@
               }
             },
             {
-              "name": "FeedlyDCR",
+              "name": "FeedlyDCR3",
               "apiVersion": "2021-09-01-preview",
               "type": "Microsoft.Insights/dataCollectionRules",
-              "location": "[parameters('workspace-location')]",
+              "location": "[resourceGroup().location]",
               "kind": null,
               "properties": {
                 "dataCollectionEndpointId": "{{DataCollectionEndpointId}}",
@@ -316,7 +316,7 @@
               "name": "feedly_indicators_CL",
               "apiVersion": "2022-10-01",
               "type": "Microsoft.OperationalInsights/workspaces/tables",
-              "location": "[parameters('workspace-location')]",
+              "location": "[resourceGroup().location]",
               "kind": null,
               "properties": {
                 "plan": "Analytics",
@@ -638,7 +638,7 @@
               "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/','FeedlyPoller')]",
               "apiVersion": "2022-12-01-preview",
               "type": "Microsoft.OperationalInsights/workspaces/providers/dataConnectors",
-              "location": "[parameters('workspace-location')]",
+              "location": "[resourceGroup().location]",
               "kind": "RestApiPoller",
               "properties": {
                 "auth": {
