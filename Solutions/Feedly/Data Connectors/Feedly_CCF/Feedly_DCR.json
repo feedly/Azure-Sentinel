@@ -7,7 +7,7 @@
         "properties": {
             "dataCollectionEndpointId": "{{dataCollectionEndpointId}}",
             "streamDeclarations": {
-                "[concat('Custom-', parameters('tableName'))]": {
+                "Custom-feedly_indicators_CL": {
                     "columns": [
                         {
                             "name": "subtype",
@@ -47,12 +47,12 @@
             "dataFlows": [
                 {
                     "streams": [
-                        "[concat('Custom-', parameters('tableName'))]"
+                        "Custom-feedly_indicators_CL"
                     ],
                     "destinations": [
                         "clv2ws1"
                     ],
-                    "outputStream": "[concat('Custom-', parameters('tableName'))]",
+                    "outputStream": "Custom-feedly_indicators_CL",
                     "transformKql": "source | extend TimeGenerated = now() , value = ['value'] , indicatorType = ['type'] , indicatorSubType = ['subtype'] , source = ['source_name'] , articleUrl = strcat('https://feedly.com/i/entry/', ['source_entry_id']) , articleTitle = ['source_entry_title'] | project TimeGenerated , value , indicatorType , indicatorSubType , source , articleUrl , articleTitle"
                 }
             ]

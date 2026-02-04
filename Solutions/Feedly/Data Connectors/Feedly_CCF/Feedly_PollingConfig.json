@@ -7,11 +7,11 @@
         "kind": "RestApiPoller",
         "properties": {
             "connectorDefinitionName": "FeedlyCCPDefinition",
-            "dataType": "{{tableName}}",
+            "dataType": "feedly_indicators_CL",
             "dcrConfig": {
                 "dataCollectionEndpoint": "{{dataCollectionEndpoint}}",
                 "dataCollectionRuleImmutableId": "{{dataCollectionRuleImmutableId}}",
-                "streamName": "[concat('Custom-', parameters('tableName'))]"
+                "streamName": "Custom-feedly_indicators_CL"
             },
             "auth": {
                 "type": "APIKey",

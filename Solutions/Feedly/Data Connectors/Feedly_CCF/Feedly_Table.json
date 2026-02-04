@@ -5,7 +5,7 @@
     "apiVersion": "2021-12-01-preview",
     "properties": {
       "totalRetentionInDays": 365,
-      "plan": "Auxiliary",
+      "plan": "Analytics",
       "schema": {
         "name": "feedly_indicators_CL",
         "description": "Feedly IoC data collected from Feedly API",
