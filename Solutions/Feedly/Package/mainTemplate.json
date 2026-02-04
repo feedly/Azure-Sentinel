@@ -32,11 +32,11 @@
   "variables": {
     "workspaceResourceId": "[resourceId('microsoft.OperationalInsights/Workspaces', parameters('workspace'))]",
     "_solutionName": "Feedly",
-    "_solutionVersion": "3.0.7",
+    "_solutionVersion": "3.0.9",
     "solutionId": "feedlyinc1693853810319.azure-sentinel-solution-feedly",
     "_solutionId": "[variables('solutionId')]",
-    "dataConnectorVersionConnectorDefinition": "3.0.7",
-    "dataConnectorVersionConnections": "3.0.7",
+    "dataConnectorVersionConnectorDefinition": "3.0.9",
+    "dataConnectorVersionConnections": "3.0.9",
     "_dataConnectorContentIdConnectorDefinition": "FeedlyConnectorTemplateConnectorDefinition",
     "dataConnectorTemplateNameConnectorDefinition": "[concat(parameters('workspace'),'-dc-',uniquestring(variables('_dataConnectorContentIdConnectorDefinition')))]",
     "_dataConnectorContentIdConnections": "FeedlyConnectorTemplateConnections",
@@ -150,7 +150,7 @@
                   ],
                   "availability": {
                     "status": 1,
-                    "isPreview": false
+                     "isPreview": true
                   },
                   "permissions": {
                     "resourceProvider": [
@@ -319,6 +319,7 @@
               "location": "[parameters('workspace-location')]",
               "kind": null,
               "properties": {
+                "plan": "Analytics",
                 "retentionInDays": 90,
                 "schema": {
                   "name": "feedly_indicators_CL",
@@ -426,7 +427,7 @@
             }
           ],
           "availability": {
-            "isPreview": false,
+            "isPreview": true,
             "status": 1
           },
           "permissions": {
