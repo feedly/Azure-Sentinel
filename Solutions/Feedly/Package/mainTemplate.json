@@ -647,6 +647,11 @@
           "criteria": [
             {
               "kind": "DataConnector",
+              "contentId": "[variables('_dataConnectorContentIdConnectorDefinition1')]",
+              "version": "[variables('dataConnectorCCPVersion')]"
+            },
+            {
+              "kind": "ResourcesDataConnector",
               "contentId": "[variables('_dataConnectorContentIdConnections1')]",
               "version": "[variables('dataConnectorCCPVersion')]"
             }
