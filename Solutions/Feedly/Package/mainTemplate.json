@@ -27,6 +27,20 @@
       "metadata": {
         "description": "Workspace name for Log Analytics where Microsoft Sentinel is setup"
       }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "resource group name where Microsoft Sentinel is setup"
+      }
+    },
+    "subscription": {
+      "type": "string",
+      "defaultValue": "[last(split(subscription().id, '/'))]",
+      "metadata": {
+        "description": "subscription id where Microsoft Sentinel is setup"
+      }
     }
   },
   "variables": {
@@ -40,9 +54,9 @@
     "dataConnectorTemplateNameConnectorDefinition1": "[concat(parameters('workspace'),'-dc-',uniquestring(variables('_dataConnectorContentIdConnectorDefinition1')))]",
     "_dataConnectorContentIdConnections1": "FeedlyCCPDefinitionConnections",
     "dataConnectorTemplateNameConnections1": "[concat(parameters('workspace'),'-dc-',uniquestring(variables('_dataConnectorContentIdConnections1')))]",
-    "dataCollectionEndpointId1": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('workspace'))]",
+    "dataCollectionEndpointId1": "[concat('/subscriptions/',parameters('subscription'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Insights/dataCollectionEndpoints/',parameters('workspace'))]",
     "blanks": "[replace('b', 'b', '')]",
-    "_solutioncontentProductId": "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
+    "_solutioncontentProductId": "[concat(take(variables('_solutionId'),50),'-','sl','-', uniqueString(concat(variables('_solutionId'),'-','Solution','-',variables('_solutionId'),'-', variables('_solutionVersion'))))]"
   },
   "resources": [
     {
@@ -71,7 +85,7 @@
               "kind": "Customizable",
               "properties": {
                 "connectorUiConfig": {
-                  "id": "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/dataConnectorDefinitions', variables('_dataConnectorContentIdConnectorDefinition1'))]",
+                  "id": "FeedlyCCPDefinition",
                   "title": "Feedly IoC",
                   "publisher": "Feedly",
                   "descriptionMarkdown": "The [Feedly](https://feedly.com/) IoC data connector provides the capability to ingest Indicators of Compromise (IoCs) from Feedly API into Microsoft Sentinel.",
@@ -320,7 +334,7 @@
         "packageKind": "Solution",
         "packageVersion": "[variables('_solutionVersion')]",
         "packageName": "[variables('_solutionName')]",
-        "contentProductId": "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentTemplates', concat(variables('dataConnectorTemplateNameConnectorDefinition1'), variables('dataConnectorCCPVersion')))]",
+        "contentProductId": "[concat(take(variables('_solutionId'), 50),'-','dc','-', uniqueString(concat(variables('_solutionId'),'-','DataConnector','-',variables('_dataConnectorContentIdConnectorDefinition1'),'-', variables('dataConnectorCCPVersion'))))]",
         "packageId": "[variables('_solutionId')]",
         "contentSchemaVersion": "3.0.0",
         "version": "[variables('dataConnectorCCPVersion')]"
@@ -334,7 +348,7 @@
       "kind": "Customizable",
       "properties": {
         "connectorUiConfig": {
-          "id": "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/dataConnectorDefinitions', variables('_dataConnectorContentIdConnectorDefinition1'))]",
+          "id": "FeedlyCCPDefinition",
           "title": "Feedly IoC",
           "publisher": "Feedly",
           "descriptionMarkdown": "The [Feedly](https://feedly.com/) IoC data connector provides the capability to ingest Indicators of Compromise (IoCs) from Feedly API into Microsoft Sentinel.",
@@ -503,7 +517,7 @@
             "dcrConfig": {
               "defaultValue": {
                 "dataCollectionEndpoint": "data collection Endpoint",
-                "dataCollectionRuleImmutableId": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('workspace'))]"
+                "dataCollectionRuleImmutableId": "data collection rule immutableId"
               },
               "type": "object"
             },
@@ -519,8 +533,7 @@
             }
           },
           "variables": {
-            "_dataConnectorContentIdConnections1": "[variables('_dataConnectorContentIdConnections1')]",
-            "dataCollectionRuleImmutableId": "[[parameters('dcrConfig').dataCollectionRuleImmutableId]"
+            "_dataConnectorContentIdConnections1": "[variables('_dataConnectorContentIdConnections1')]"
           },
           "resources": [
             {
@@ -559,7 +572,7 @@
                 "dataType": "feedly_indicators_CL",
                 "dcrConfig": {
                   "dataCollectionEndpoint": "[[parameters('dcrConfig').dataCollectionEndpoint]",
-                  "dataCollectionRuleImmutableId": "[[variables('dataCollectionRuleImmutableId')]",
+                  "dataCollectionRuleImmutableId": "[[parameters('dcrConfig').dataCollectionRuleImmutableId]",
                   "streamName": "Custom-feedly_indicators_CL"
                 },
                 "auth": {
@@ -605,7 +618,7 @@
         "packageKind": "Solution",
         "packageVersion": "[variables('_solutionVersion')]",
         "packageName": "[variables('_solutionName')]",
-        "contentProductId": "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentTemplates', concat(variables('dataConnectorTemplateNameConnections1'), variables('dataConnectorCCPVersion')))]",
+        "contentProductId": "[concat(take(variables('_solutionId'), 50),'-','rdc','-', uniqueString(concat(variables('_solutionId'),'-','ResourcesDataConnector','-',variables('_dataConnectorContentIdConnections1'),'-', variables('dataConnectorCCPVersion'))))]",
         "packageId": "[variables('_solutionId')]",
         "contentSchemaVersion": "3.0.0",
         "version": "[variables('dataConnectorCCPVersion')]"

@@ -28,7 +28,7 @@ function Get-ConnectionsTemplateParameters($activeResource) {
     $dcrConfigParameter = [PSCustomObject]@{
         defaultValue = [PSCustomObject]@{
             dataCollectionEndpoint        = "data collection Endpoint";
-            dataCollectionRuleImmutableId = "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('workspace'))]";
+            dataCollectionRuleImmutableId = "data collection rule immutableId";
         };
         type         = "object";
     }
@@ -236,7 +236,7 @@ function Get-ContentTemplateResource($contentResourceDetails, $TemplateCounter, 
             packageKind          = "Solution";
             packageVersion       = "[variables('_solutionVersion')]";
             packageName          = "[variables('_solutionName')]";
-            contentProductId     = "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentTemplates', concat($contentTemplateName, $contentVersion))]";
+            contentProductId     = "[concat(take(variables('_solutionId'), 50),'-','$resoureKindTag','-', uniqueString(concat(variables('_solutionId'),'-','$resoureKind','-',$contentId,'-', $contentVersion)))]";
             packageId            = "[variables('_solutionId')]";
             contentSchemaVersion = $contentResourceDetails.contentSchemaVersion;
             version              = "[variables('dataConnectorCCPVersion')]";
@@ -459,9 +459,6 @@ function createCCPConnectorResources($contentResourceDetails, $dataFileMetadata,
 
                         ProcessPropertyPlaceholders -armResource $armResource -templateContentConnections $templateContentConnections -isOnlyObjectCheck $false -propertyObject $armResource -propertyName 'location' -isInnerObject $false -innerObjectName $null -kindType $null -isSecret $true -isRequired $false -fileType 'dataConnectorDefinitions' -minLength 1
 
-                        # IDs Should Be Derived From ResourceIDs: ensure connectorUiConfig.id resolves to resourceId.
-                        $armResource.properties.connectorUiConfig.id = "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/dataConnectorDefinitions', variables('_dataConnectorContentId$($templateKindByCounter[1])$($global:connectorCounter)'))]"
-
                         $templateContentConnectorDefinition = $templateContent;
                         $templateContentConnectorDefinition.properties.mainTemplate.resources += $armResource
 
@@ -647,16 +644,12 @@ function createCCPConnectorResources($contentResourceDetails, $dataFileMetadata,
                         $placeHoldersMatched = $dataCollectionRuleImmutableIdProperty | Select-String $placeHolderPatternMatches -AllMatches
     
                         if ($placeHoldersMatched.Matches.Value.Count -gt 0) {
-                            $armResource.properties.dcrConfig.dataCollectionRuleImmutableId = "[[variables('dataCollectionRuleImmutableId')]"
+                            $armResource.properties.dcrConfig.dataCollectionRuleImmutableId = "[[parameters('dcrConfig').dataCollectionRuleImmutableId]"
                         }
                     }
                     else {
                         # if dataCollectionRuleImmutableId property not present then add it 
-                        $armResource.properties.dcrConfig | Add-Member -MemberType NoteProperty -Name "dataCollectionRuleImmutableId" -Value "[[variables('dataCollectionRuleImmutableId')]"
-                    }
-
-                    if (-not ($templateContentConnections.properties.mainTemplate.variables.PSObject.Properties.Name -contains "dataCollectionRuleImmutableId")) {
-                        $templateContentConnections.properties.mainTemplate.variables | Add-Member -NotePropertyName "dataCollectionRuleImmutableId" -NotePropertyValue "[[parameters('dcrConfig').dataCollectionRuleImmutableId]"
+                        $armResource.properties.dcrConfig | Add-Member -MemberType NoteProperty -Name "dataCollectionRuleImmutableId" -Value "[[parameters('dcrConfig').dataCollectionRuleImmutableId]"
                     }
                     
                     $fileType = 'data Connector poller'
@@ -798,7 +791,7 @@ function createCCPConnectorResources($contentResourceDetails, $dataFileMetadata,
                         $armResource.properties.dataCollectionEndpointId = "[variables('$($dataCollectionEndpointIdPropertyName)')]"
                         
                         if (!$global:baseMainTemplate.variables."$dataCollectionEndpointIdPropertyName") {
-                            $global:baseMainTemplate.variables | Add-Member -NotePropertyName "$dataCollectionEndpointIdPropertyName" -NotePropertyValue "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('workspace'))]"
+                            $global:baseMainTemplate.variables | Add-Member -NotePropertyName "$dataCollectionEndpointIdPropertyName" -NotePropertyValue "[concat('/subscriptions/',parameters('subscription'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Insights/dataCollectionEndpoints/',parameters('workspace'))]"
                         }
                     }
                 }
@@ -807,8 +800,18 @@ function createCCPConnectorResources($contentResourceDetails, $dataFileMetadata,
                     $armResource.properties | Add-Member -MemberType NoteProperty -Name "dataCollectionEndpointId" -Value "[variables('dataCollectionEndpointId')]"
 
                     if (!$global:baseMainTemplate.variables.dataCollectionEndpointId) {
-                        $global:baseMainTemplate.variables | Add-Member -NotePropertyName "dataCollectionEndpointId" -NotePropertyValue "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('workspace'))]"
+                        $global:baseMainTemplate.variables | Add-Member -NotePropertyName "dataCollectionEndpointId" -NotePropertyValue "[concat('/subscriptions/',parameters('subscription'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Insights/dataCollectionEndpoints/',parameters('workspace'))]"
                     }
+                }
+
+                if (!$global:baseMainTemplate.parameters.resourceGroupName) {
+                    $resourceGroupNameParameter = [PSCustomObject] @{ type = "string"; defaultValue = "[resourceGroup().name]"; metadata = [PSCustomObject] @{ description = "resource group name where Microsoft Sentinel is setup" }; }
+                    $global:baseMainTemplate.parameters | Add-Member -MemberType NoteProperty -Name "resourceGroupName" -Value $resourceGroupNameParameter
+                }
+
+                if (!$global:baseMainTemplate.parameters.subscription) {
+                    $subscriptionParameter = [PSCustomObject] @{ type = "string"; defaultValue = "[last(split(subscription().id, '/'))]"; metadata = [PSCustomObject] @{ description = "subscription id where Microsoft Sentinel is setup" }; }
+                    $global:baseMainTemplate.parameters | Add-Member -MemberType NoteProperty -Name "subscription" -Value $subscriptionParameter
                 }
 
                 # workspaceResourceId

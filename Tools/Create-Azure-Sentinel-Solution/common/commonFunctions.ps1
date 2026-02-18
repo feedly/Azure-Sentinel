@@ -558,7 +558,7 @@ function PrepareSolutionMetadata($solutionMetadataRawContent, $contentResourceDe
             $newMetadata.Properties | Add-Member -Name 'descriptionHtml' -Type NoteProperty -Value $contentToImport.Description;
             $newMetadata.Properties | Add-Member -Name 'contentKind' -Type NoteProperty -Value "Solution";
 
-            $global:baseMainTemplate.variables | Add-Member -NotePropertyName "_solutioncontentProductId" -NotePropertyValue "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
+            $global:baseMainTemplate.variables | Add-Member -NotePropertyName "_solutioncontentProductId" -NotePropertyValue "[concat(take(variables('_solutionId'),50),'-','$($ContentKindDict.ContainsKey("Solution") ? $ContentKindDict["Solution"] : '')','-', uniqueString(concat(variables('_solutionId'),'-','Solution','-',variables('_solutionId'),'-', variables('_solutionVersion'))))]"
 	    $newMetadata.Properties | Add-Member -Name 'contentProductId' -Type NoteProperty -Value "[variables('_solutioncontentProductId')]"
             $newMetadata.Properties | Add-Member -Name 'id' -Type NoteProperty -Value "[variables('_solutioncontentProductId')]"
             $newMetadata.Properties | Add-Member -Name 'icon' -Type NoteProperty -Value $contentToImport.Logo;
