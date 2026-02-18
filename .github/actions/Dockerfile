@@ -1,5 +1,5 @@
 
-FROM mcr.microsoft.com/powershell:7.2-ubuntu-20.04
+FROM mcr.microsoft.com/powershell:latest
 
 ARG SolutionName
 
