@@ -3,14 +3,16 @@ name: Cleanup Stale Branches
 run-name: Stale Branches Cleanup Running 
 
 on:
+  # Allows to run workflow manually from the Actions tab
+  workflow_dispatch:
   schedule:
   # Runs at 4:00 AM every day (Monday to Sunday)
     - cron: '0 4 * * *'
-  # Allows to run workflow manually from the Actions tab
-  workflow_dispatch:
 
 permissions:
   contents: write
+  actions: read
+  pull-requests: read
 
 jobs:
   cleanup_stale_branches:
@@ -19,22 +21,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup Stale Branches
-        uses: crs-k/stale-branches@593086d4e251bb26dd5cd21202d0102fcf172164
+        uses: fpicalausa/remove-stale-branches@7c4f2afe88a36c0f9114cd958380979b9d7323fb
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
-          days-before-stale: 120
-          days-before-delete: 180
-          comment-updates: false
-          max-issues: 20
-          tag-committer: false
-          stale-branch-label: 'stale-branch'
-          compare-branches: 'info'
-          branches-filter-regex: '^((?!dependabot))'
-          rate-limit: true
-          pr-check: true
-          dry-run: true
-          ignore-issue-interaction: true
-          include-protected-branches: false
-          include-ruleset-branches: false
-          ignore-commit-messages: ''
-          ignore-committers: ''
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          days-before-branch-stale: 90
+          days-before-branch-delete: 30
+          operations-per-run: 50
+          dry-run: false
+          ignore-branches-with-open-prs: true
+          stale-branch-message: |
+            Dear @{author}, Your branch [{branchName}]({branchUrl}) has not been updated in the last {daysBeforeBranchStale} days and is marked as stale. It will be removed in {daysBeforeBranchDelete} days.
+            If you want to keep this branch around, delete this comment or add new commits to this branch.
+          exempt-branches-regex: '^(main|master|dependabot/.*|release/.*)$'
