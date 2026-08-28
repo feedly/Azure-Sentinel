@@ -8,6 +8,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.lscache
 *.lock
 .bundle/
 
@@ -347,3 +348,13 @@ Hunting Queries/DeployedQueries.json
 .script/**/*.d.ts
 .script/**/*.d.ts.map
 /.vscode
+
+# cspell
+**/cspell-results.json
+
+
+.arm-ttk
+
+
+# Local-only helper scripts (not for upstream submission)
+.local-helpers/
